@@ -1,0 +1,5 @@
+build/
+*.csv
+*.svg
+.tmp.*
+*~
