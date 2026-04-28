@@ -20,6 +20,12 @@ struct State {
   double H;
 };
 
+// variables in relative form to the equilibrium point
+struct StateRel {
+  double sheep;
+  double wolf;
+};
+
 struct Statistics {
   double mean;
   double sigma;
@@ -30,25 +36,33 @@ struct Statistics {
 class Simulation {
   Parameters const par_;
   double const dt_;
-  std::size_t const steps_;
-  State state_;
+  double const duration_;
+  std::size_t const iterations_;
+  StateRel state_;
   std::vector<State> evolution_;
   Statistics sheep_stats_;
   Statistics wolf_stats_;
 
   explicit Simulation(Parameters par, double sheep, double wolf, double dt,
-                      std::size_t steps);
+                      double duration);
+
+  // validation
   static Parameters const& is_valid(Parameters const& p);
   static double is_positive(double val);
   static double check_dt(double dt);
-  static std::size_t to_steps(double duration, double dt);
+  static std::size_t count_iterations(double duration, double dt);
+
+  // input reading helper
+  static Parameters read_parameters();
+  static double read_population(std::string const& prompt);
+  static double read_dt();
+  static double read_duration();
 
  public:
   Simulation(Parameters p, double sheep, double wolf, double dt,
              double duration)
       : Simulation(is_valid(p), is_positive(sheep), is_positive(wolf),
-                   check_dt(dt),
-                   to_steps(is_positive(duration), check_dt(dt))) {}
+                   check_dt(dt), is_positive(duration)) {}
 
   Simulation();
 
@@ -58,7 +72,8 @@ class Simulation {
   State const& current_state() const { return evolution_.back(); }
   std::vector<State> const& evolution() const { return evolution_; }
   double dt() const { return dt_; }
-  std::size_t steps() const { return steps_; }
+  double duration() const { return duration_; }
+  std::size_t iterations() const { return iterations_; }
   Statistics const& sheep_stats() const { return sheep_stats_; }
   Statistics const& wolf_stats() const { return wolf_stats_; }
 
