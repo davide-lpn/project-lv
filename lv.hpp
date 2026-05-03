@@ -91,6 +91,95 @@ class Simulation {
   void plot_all(std::string const& filename) const;
 };
 
+void Simulation::plot_all(std::string const& filename) const {
+  // writing data on a temporary CSV file
+  std::ofstream data{".tmp_data.csv"};
+  if (!data) {
+    throw std::runtime_error{"Cannot create temporary data file"};
+  }
+
+  data << std::fixed << std::setprecision(6);
+  double time = 0.;
+  for (auto const& state : evolution_) {
+    data << time << '\t' << state.sheep << '\t' << state.wolf << '\t' << state.H
+         << '\n';
+    time += dt_;
+  }
+  data.close();
+
+  // Writing Gnuplot temporary script
+  std::ofstream script{".tmp_script.gp"};
+  if (!script) {
+    throw std::runtime_error{"Cannot create temporary script file"};
+  }
+
+  script << "set terminal pngcairo size 1200,800\n"
+         << "set output '" << filename << "'\n"
+         << "set multiplot layout 2,1\n"
+         << "set xlabel 'time'\n"
+         << "set ylabel 'population'\n"
+         << "set title 'Lotka-Volterra: Sheep and Wolf populations'\n"
+         << "plot '.tmp_data.csv' using 1:2 with lines title 'sheep', "
+         << "     '.tmp_data.csv' using 1:3 with lines title 'wolf'\n"
+         << "set ylabel 'H'\n"
+         << "set title 'First integral H'\n"
+         << "plot '.tmp_data.csv' using 1:4 with lines title 'H'\n"
+         << "unset multiplot\n";
+  script.close();
+
+  // execute Gnuplot
+  if (system("gnuplot -persistent .tmp_script.gp") != 0) {
+    throw std::runtime_error{"Gnuplot execution failed"};
+  }
+
+  system("rm .tmp_data.csv .tmp_script.gp");
+}
+
+void Simulation::plot_all(std::string const& filename) const {
+  // scrive i dati su file CSV temporaneo
+  std::ofstream data{".tmp_data.csv"};
+  if (!data) {
+    throw std::runtime_error{"Cannot create temporary data file"};
+  }
+
+  data << std::fixed << std::setprecision(6);
+  double time = 0.;
+  for (auto const& state : evolution_) {
+    data << time << '\t' << state.sheep << '\t' << state.wolf << '\t' << state.H
+         << '\n';
+    time += dt_;
+  }
+  data.close();
+
+  // scrive il copione Gnuplot
+  std::ofstream script{".tmp_script.gp"};
+  if (!script) {
+    throw std::runtime_error{"Cannot create temporary script file"};
+  }
+
+  script << "set terminal pngcairo size 1200,800\n"
+         << "set output '" << filename << "'\n"
+         << "set multiplot layout 2,1\n"
+         << "set xlabel 'time'\n"
+         << "set ylabel 'population'\n"
+         << "set title 'Lotka-Volterra: Sheep and Wolf populations'\n"
+         << "plot '.tmp_data.csv' using 1:2 with lines title 'sheep', "
+         << "     '.tmp_data.csv' using 1:3 with lines title 'wolf'\n"
+         << "set ylabel 'H'\n"
+         << "set title 'First integral H'\n"
+         << "plot '.tmp_data.csv' using 1:4 with lines title 'H'\n"
+         << "unset multiplot\n";
+  script.close();
+
+  // esegue Gnuplot
+  if (system("gnuplot -persistent .tmp_script.gp") != 0) {
+    throw std::runtime_error{"Gnuplot execution failed"};
+  }
+
+  // rimuove i file temporanei
+  system("rm .tmp_data.csv .tmp_script.gp");
+}
+
 bool operator==(Parameters const& a, Parameters const& b);
 bool operator==(State const& a, State const& b);
 
