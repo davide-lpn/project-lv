@@ -80,8 +80,8 @@ class Simulation {
   // calculation methods
   void evolve();
   void compute();
-  void statistics();
   double delta_H() const;
+  void statistics();
 
   // output methods
   void print_evolution() const;
