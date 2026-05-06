@@ -1,9 +1,25 @@
+#include <ctime>
+#include <string>
+
 #include "lv.hpp"
+
+static std::string timestamp() {
+  std::time_t t = std::time(nullptr);
+  char buf[20];
+  std::strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", std::localtime(&t));
+  return std::string(buf);
+}
 
 int main() {
   try {
     lv::Simulation s;
     s.compute();
+
+    std::string dir = "results_" + timestamp();
+
+    if (system(("mkdir -p " + dir).c_str()) != 0) {
+      throw std::runtime_error{"Cannot create output directory"};
+    }
 
     std::cout << "\nSimulation complete.\n";
     std::cout << "What would you like to do?\n";
@@ -18,42 +34,32 @@ int main() {
     int choice;
     std::cin >> choice;
 
-    std::string filename;
-
     switch (choice) {
       case 1:
         s.print_evolution();
         break;
       case 2:
-        std::cout << "Enter output filename: ";
-        std::cin >> filename;
-        s.save_evolution(filename);
+        s.save_evolution(dir + "/evolution.txt");
+        std::cout << "Saved to: " << dir << "/evolution.txt\n";
         break;
       case 3:
         s.print_statistics();
         break;
       case 4:
-        std::cout << "Enter output filename: ";
-        std::cin >> filename;
-        s.save_statistics(filename);
+        s.save_statistics(dir + "/statistics.txt");
+        std::cout << "Saved to: " << dir << "/statistics.txt\n";
         break;
       case 5:
-        std::cout << "Enter output filename (e.g. plot.png): ";
-        std::cin >> filename;
-        s.plot_all(filename);
+        s.plot_all(dir + "/plot.png");
+        std::cout << "Plot saved to: " << dir << "/plot.png\n";
         break;
       case 6:
         s.print_evolution();
-        std::cout << "Enter filename for evolution: ";
-        std::cin >> filename;
-        s.save_evolution(filename);
+        s.save_evolution(dir + "/evolution.txt");
         s.print_statistics();
-        std::cout << "Enter filename for statistics: ";
-        std::cin >> filename;
-        s.save_statistics(filename);
-        std::cout << "Enter filename for plot (e.g. plot.png): ";
-        std::cin >> filename;
-        s.plot_all(filename);
+        s.save_statistics(dir + "/statistics.txt");
+        s.plot_all(dir + "/plot.png");
+        std::cout << "All files saved in: " << dir << "/\n";
         break;
       default:
         std::cerr << "Invalid choice\n";

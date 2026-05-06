@@ -70,10 +70,7 @@ double Simulation::read_duration() {
 }
 
 Simulation::Simulation(Parameters par, double sheep, double wolf, double dt, double duration)
-    : par_{is_valid(par)},
-      dt_{check_dt(dt)},
-      duration_{is_positive(duration)},
-      iterations_{count_iterations(duration_, dt_)} {
+    : par_{is_valid(par)}, dt_{check_dt(dt)}, duration_{is_positive(duration)} {
   sheep = is_positive(sheep);
   wolf = is_positive(wolf);
   double H0 = (par_.C * sheep) + (par_.B * wolf) - (par_.D * std::log(sheep)) - (par_.A * std::log(wolf));
@@ -107,7 +104,8 @@ void Simulation::evolve() {
 }
 
 void Simulation::compute() {
-  for (; evolution_.size() < iterations_ + 1;) {
+  auto const n = count_iterations(duration_, dt_);
+  for (; evolution_.size() < n + 1;) {
     try {
       evolve();
     } catch (std::runtime_error const& e) {
@@ -201,6 +199,11 @@ void Simulation::save_evolution(std::string const& filename) const {
 void Simulation::print_statistics() {
   statistics();
   std::cout << std::fixed << std::setprecision(6);
+  std::cout << "Simulation parameters:\n"
+            << "  duration:   " << duration_ << '\n'
+            << "  dt:         " << dt_ << '\n'
+            << "  iterations: " << iterations() << '\n';
+  std::cout << std::fixed << std::setprecision(6);
   std::cout << "Sheep statistics:\n"
             << " mean: " << sheep_stats_.mean << '\n'
             << " sigma: " << sheep_stats_.sigma << '\n'
@@ -225,6 +228,11 @@ void Simulation::save_statistics(std::string const& filename) {
   }
 
   file << std::fixed << std::setprecision(6);
+  file << "Simulation parameters:\n"
+       << "  duration:   " << duration_ << '\n'
+       << "  dt:         " << dt_ << '\n'
+       << "  iterations: " << iterations() << '\n';
+
   file << "Sheep statistics:\n"
        << " mean: " << sheep_stats_.mean << '\n'
        << "sigma: " << sheep_stats_.sigma << '\n'

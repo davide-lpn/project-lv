@@ -37,7 +37,6 @@ class Simulation {
   Parameters const par_;
   double const dt_;
   double const duration_;
-  std::size_t const iterations_;
   StateRel state_;
   std::vector<State> evolution_;
   Statistics sheep_stats_;
@@ -67,7 +66,7 @@ class Simulation {
   std::vector<State> const& evolution() const { return evolution_; }
   double dt() const { return dt_; }
   double duration() const { return duration_; }
-  std::size_t iterations() const { return iterations_; }
+  std::size_t iterations() const { return count_iterations(duration_, dt_); }
   Statistics const& sheep_stats() const { return sheep_stats_; }
   Statistics const& wolf_stats() const { return wolf_stats_; }
 

@@ -1,0 +1,11 @@
+Sheep statistics:
+ mean: 148.850277
+sigma: 28.604072
+  maximum: 194.878873
+  minimum: 112.552558
+Wolf statistics:
+  mean:    30.400678
+  sigma:   9.105128
+  maximum: 44.931118
+  minimum: 18.826358
+Delta H: 0.002475
