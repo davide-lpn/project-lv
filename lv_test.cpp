@@ -41,6 +41,16 @@ TEST_CASE("Testing constructors") {
 
   SUBCASE("Zero dt throws") { CHECK_THROWS(lv::Simulation(test_par, test_sheep, test_wolf, 0., test_duration)); }
 
+  SUBCASE("dt above 0.001 warns but does not throw") {
+    bool ok = true;
+    try {
+      lv::Simulation s(test_par, test_sheep, test_wolf, 0.002, test_duration);
+    } catch (...) {
+      ok = false;
+    }
+    CHECK(ok);
+  }
+
   SUBCASE("Zero duration throws") { CHECK_THROWS(lv::Simulation(test_par, test_sheep, test_wolf, test_dt, 0.)); }
 }
 
@@ -122,6 +132,37 @@ TEST_CASE("Testing single step simulation") {
   lv::Simulation s(test_par, test_sheep, test_wolf, test_dt, test_dt);
   s.compute();
   CHECK(s.evolution().size() == 2);
+}
+
+TEST_CASE("Testing getters") {
+  lv::Simulation s(test_par, test_sheep, test_wolf, test_dt, test_duration);
+
+  SUBCASE("parameters() returns the parameters passed at construction") { CHECK(s.parameters() == test_par); }
+
+  SUBCASE("dt() returns the time step passed at construction") { CHECK(s.dt() == doctest::Approx(test_dt)); }
+
+  SUBCASE("duration() returns the duration passed at construction") {
+    CHECK(s.duration() == doctest::Approx(test_duration));
+  }
+
+  SUBCASE("iterations() matches duration / dt") {
+    // 1.0 / 0.001 = 1000
+    CHECK(s.iterations() == 1000);
+  }
+
+  SUBCASE("sheep_stats() and wolf_stats() are valid after compute() and statistics()") {
+    s.compute();
+    s.statistics();
+    // means must be positive (populations are always positive)
+    CHECK(s.sheep_stats().mean > 0.);
+    CHECK(s.wolf_stats().mean > 0.);
+    // maximum must be >= minimum
+    CHECK(s.sheep_stats().maximum >= s.sheep_stats().minimum);
+    CHECK(s.wolf_stats().maximum >= s.wolf_stats().minimum);
+    // sigma must be non-negative
+    CHECK(s.sheep_stats().sigma >= 0.);
+    CHECK(s.wolf_stats().sigma >= 0.);
+  }
 }
 
 TEST_CASE("Testing operator==") {

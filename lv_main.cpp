@@ -27,8 +27,9 @@ int main() {
     std::cout << "  [2] Save evolution to file\n";
     std::cout << "  [3] Print statistics\n";
     std::cout << "  [4] Save statistics to file\n";
-    std::cout << "  [5] Generate plot\n";
-    std::cout << "  [6] Do all of the above\n";
+    std::cout << "  [5] Generate evolution plot\n";
+    std::cout << "  [6] Generate phase space plot\n";
+    std::cout << "  [7] Do all of the above\n";
     std::cout << "Enter choice: ";
 
     int choice;
@@ -50,15 +51,20 @@ int main() {
         std::cout << "Saved to: " << dir << "/statistics.txt\n";
         break;
       case 5:
-        s.plot_all(dir + "/plot.png");
-        std::cout << "Plot saved to: " << dir << "/plot.png\n";
+        s.plot_evolution(dir + "/plot_evolution.png");
+        std::cout << "Plot saved to: " << dir << "/plot_evolution.png\n";
         break;
       case 6:
+        s.plot_phase_space(dir + "/plot_phase_space.png");
+        std::cout << "Phase space plot saved to: " << dir << "/plot_phase_space.png\n";
+        break;
+      case 7:
         s.print_evolution();
         s.save_evolution(dir + "/evolution.txt");
         s.print_statistics();
         s.save_statistics(dir + "/statistics.txt");
-        s.plot_all(dir + "/plot.png");
+        s.plot_evolution(dir + "/plot_evolution.png");
+        s.plot_phase_space(dir + "/plot_phase_space.png");
         std::cout << "All files saved in: " << dir << "/\n";
         break;
       default:

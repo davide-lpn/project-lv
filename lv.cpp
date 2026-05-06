@@ -1,11 +1,21 @@
 #include "lv.hpp"
 
 #include <algorithm>
-#include <cassert>
 #include <fstream>
 #include <iomanip>
 #include <numeric>
 #include <stdexcept>
+
+namespace {
+double read_double(std::string const& prompt) {
+  double val;
+  std::cout << prompt;
+  if (!(std::cin >> val)) {
+    throw std::invalid_argument{"Invalid input: expected a number"};
+  }
+  return val;
+}
+}  // namespace
 
 namespace lv {
 
@@ -33,44 +43,26 @@ double Simulation::check_dt(double dt) {
   return dt;
 }
 
-std::size_t Simulation::count_iterations(double duration, double dt) { return static_cast<std::size_t>(duration / dt); }
-
 Parameters Simulation::read_parameters() {
   Parameters p;
-  std::cout << "Enter sheep birth rate (A): ";
-  std::cin >> p.A;
-  std::cout << "Enter sheep death rate (B): ";
-  std::cin >> p.B;
-  std::cout << "Enter wolf birth rate (C): ";
-  std::cin >> p.C;
-  std::cout << "Enter wolf death rate (D): ";
-  std::cin >> p.D;
+  p.A = read_double("Enter sheep birth rate (A): ");
+  p.B = read_double("Enter sheep death rate (B): ");
+  p.C = read_double("Enter wolf birth rate (C): ");
+  p.D = read_double("Enter wolf death rate (D): ");
   return p;
 }
 
-double Simulation::read_population(std::string const& prompt) {
-  double val;
-  std::cout << prompt;
-  std::cin >> val;
-  return val;
-}
+double Simulation::read_population(std::string const& prompt) { return read_double(prompt); }
 
-double Simulation::read_dt() {
-  double dt;
-  std::cout << "Enter time step (dt, recommended <= 0.001): ";
-  std::cin >> dt;
-  return dt;
-}
+double Simulation::read_dt() { return read_double("Enter time step (dt, recommended <= 0.001): )"); }
 
-double Simulation::read_duration() {
-  double duration;
-  std::cout << "Enter simulation duration: ";
-  std::cin >> duration;
-  return duration;
-}
+double Simulation::read_duration() { return read_double("Enter simulation duration: "); }
 
 Simulation::Simulation(Parameters par, double sheep, double wolf, double dt, double duration)
-    : par_{is_valid(par)}, dt_{check_dt(dt)}, duration_{is_positive(duration)} {
+    : par_{is_valid(par)},
+      dt_{check_dt(dt)},
+      duration_{is_positive(duration)},
+      iterations_{static_cast<std::size_t>(duration / dt)} {
   sheep = is_positive(sheep);
   wolf = is_positive(wolf);
   double H0 = (par_.C * sheep) + (par_.B * wolf) - (par_.D * std::log(sheep)) - (par_.A * std::log(wolf));
@@ -104,8 +96,7 @@ void Simulation::evolve() {
 }
 
 void Simulation::compute() {
-  auto const n = count_iterations(duration_, dt_);
-  for (; evolution_.size() < n + 1;) {
+  for (; evolution_.size() < iterations_ + 1;) {
     try {
       evolve();
     } catch (std::runtime_error const& e) {
@@ -248,7 +239,7 @@ void Simulation::save_statistics(std::string const& filename) {
   file << "Delta H: " << delta_H() << '\n';
 }
 
-void Simulation::plot_all(std::string const& filename) const {
+void Simulation::plot_evolution(std::string const& filename) const {
   // writing data on a temporary CSV file
   std::ofstream data{".tmp_data.csv"};
   if (!data) {
@@ -289,6 +280,42 @@ void Simulation::plot_all(std::string const& filename) const {
   }
 
   if (system("rm .tmp_data.csv .tmp_script.gp") != 0) {
+    std::cerr << "Warning: could not remove temporary files\n";
+  }
+}
+
+void Simulation::plot_phase_space(std::string const& filename) const {
+  // write sheep and wolf values to a temporary file (no time column needed)
+  std::ofstream data{".tmp_phase.csv"};
+  if (!data) {
+    throw std::runtime_error{"Cannot create temporary data file"};
+  }
+
+  data << std::fixed << std::setprecision(6);
+  for (auto const& state : evolution_) {
+    data << state.sheep << '\t' << state.wolf << '\n';
+  }
+  data.close();
+
+  // write the Gnuplot script: x axis = sheep, y axis = wolf
+  std::ofstream script{".tmp_phase.gp"};
+  if (!script) {
+    throw std::runtime_error{"Cannot create temporary script file"};
+  }
+
+  script << "set terminal pngcairo size 800,800\n"
+         << "set output '" << filename << "'\n"
+         << "set xlabel 'sheep'\n"
+         << "set ylabel 'wolf'\n"
+         << "set title 'Lotka-Volterra: phase space orbit'\n"
+         << "plot '.tmp_phase.csv' using 1:2 with lines title 'orbit'\n";
+  script.close();
+
+  if (system("gnuplot -persistent .tmp_phase.gp") != 0) {
+    throw std::runtime_error{"Gnuplot execution failed"};
+  }
+
+  if (system("rm .tmp_phase.csv .tmp_phase.gp") != 0) {
     std::cerr << "Warning: could not remove temporary files\n";
   }
 }

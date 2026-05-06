@@ -37,6 +37,7 @@ class Simulation {
   Parameters const par_;
   double const dt_;
   double const duration_;
+  std::size_t const iterations_;
   StateRel state_;
   std::vector<State> evolution_;
   Statistics sheep_stats_;
@@ -46,7 +47,6 @@ class Simulation {
   static Parameters const& is_valid(Parameters const& p);
   static double is_positive(double val);
   static double check_dt(double dt);
-  static std::size_t count_iterations(double duration, double dt);
 
   // input reading helper
   static Parameters read_parameters();
@@ -66,7 +66,7 @@ class Simulation {
   std::vector<State> const& evolution() const { return evolution_; }
   double dt() const { return dt_; }
   double duration() const { return duration_; }
-  std::size_t iterations() const { return count_iterations(duration_, dt_); }
+  std::size_t iterations() const { return iterations_; }
   Statistics const& sheep_stats() const { return sheep_stats_; }
   Statistics const& wolf_stats() const { return wolf_stats_; }
 
@@ -81,7 +81,8 @@ class Simulation {
   void save_evolution(std::string const& filename) const;
   void print_statistics();
   void save_statistics(std::string const& filename);
-  void plot_all(std::string const& filename) const;
+  void plot_evolution(std::string const& filename) const;
+  void plot_phase_space(std::string const& filename) const;
 };
 
 bool operator==(Parameters const& a, Parameters const& b);
