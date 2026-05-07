@@ -1,0 +1,15 @@
+Simulation parameters:
+  duration:   100.000000
+  dt:         0.001000
+  iterations: 100000
+Sheep statistics:
+ mean: 149.848161
+ sigma: 28.969217
+  maximum: 196.065045
+  minimum: 111.835974
+Wolf statistics:
+  mean:    29.962447
+  sigma:   9.175769
+  maximum: 45.290994
+  minimum: 18.597996
+Delta H: 0.005044

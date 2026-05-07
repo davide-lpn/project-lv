@@ -202,11 +202,10 @@ void Simulation::print_statistics() {
             << "  iterations: " << iterations() << '\n';
   std::cout << std::fixed << std::setprecision(6);
   std::cout << "Sheep statistics:\n"
-            << " mean: " << sheep_stats_.mean << '\n'
-            << " sigma: " << sheep_stats_.sigma << '\n'
+            << "  mean:    " << sheep_stats_.mean << '\n'
+            << "  sigma:   " << sheep_stats_.sigma << '\n'
             << "  maximum: " << sheep_stats_.maximum << '\n'
             << "  minimum: " << sheep_stats_.minimum << '\n';
-
   std::cout << "Wolf statistics:\n"
             << "  mean:    " << wolf_stats_.mean << '\n'
             << "  sigma:   " << wolf_stats_.sigma << '\n'
@@ -230,8 +229,8 @@ void Simulation::save_statistics(std::string const& filename) {
        << "  iterations: " << iterations() << '\n';
 
   file << "Sheep statistics:\n"
-       << " mean: " << sheep_stats_.mean << '\n'
-       << " sigma: " << sheep_stats_.sigma << '\n'
+       << "  mean:    " << sheep_stats_.mean << '\n'
+       << "  sigma:   " << sheep_stats_.sigma << '\n'
        << "  maximum: " << sheep_stats_.maximum << '\n'
        << "  minimum: " << sheep_stats_.minimum << '\n';
 
