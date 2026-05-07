@@ -204,15 +204,14 @@ void Simulation::print_statistics() {
   std::cout << "Sheep statistics:\n"
             << " mean: " << sheep_stats_.mean << '\n'
             << " sigma: " << sheep_stats_.sigma << '\n'
-            << " maximum: " << sheep_stats_.maximum << '\n'
-            << " minimum: " << sheep_stats_.minimum << '\n';
+            << "  maximum: " << sheep_stats_.maximum << '\n'
+            << "  minimum: " << sheep_stats_.minimum << '\n';
 
   std::cout << "Wolf statistics:\n"
-            << " mean: " << wolf_stats_.mean << '\n'
-            << " sigma: " << wolf_stats_.sigma << '\n'
-            << " maximum: " << wolf_stats_.maximum << '\n'
-            << " minimum: " << wolf_stats_.minimum << '\n';
-
+            << "  mean:    " << wolf_stats_.mean << '\n'
+            << "  sigma:   " << wolf_stats_.sigma << '\n'
+            << "  maximum: " << wolf_stats_.maximum << '\n'
+            << "  minimum: " << wolf_stats_.minimum << '\n';
   std::cout << "Delta H: " << delta_H() << '\n';
 }
 

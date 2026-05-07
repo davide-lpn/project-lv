@@ -20,12 +20,6 @@ struct State {
   double H;
 };
 
-// variables in relative form to the equilibrium point
-struct StateRel {
-  double sheep;
-  double wolf;
-};
-
 struct Statistics {
   double mean{0.};
   double sigma{0.};
@@ -34,6 +28,12 @@ struct Statistics {
 };
 
 class Simulation {
+  // variables in relative form to the equilibrium point
+  struct StateRel {
+    double sheep;
+    double wolf;
+  };
+
   Parameters const par_;
   double const dt_;
   double const duration_;
