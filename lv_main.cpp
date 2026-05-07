@@ -15,12 +15,6 @@ int main() {
     lv::Simulation s;
     s.compute();
 
-    std::string dir = "results_" + timestamp();
-
-    if (system(("mkdir -p " + dir).c_str()) != 0) {
-      throw std::runtime_error{"Cannot create output directory"};
-    }
-
     std::cout << "\nSimulation complete.\n";
     std::cout << "What would you like to do?\n";
     std::cout << "  [1] Print evolution to screen\n";
@@ -35,30 +29,47 @@ int main() {
     int choice;
     std::cin >> choice;
 
+    auto make_dir = [&]() -> std::string {
+      std::string dir = "results_" + timestamp();
+      if (system(("mkdir -p " + dir).c_str()) != 0) {
+        throw std::runtime_error{"Cannot create output directory"};
+      }
+      return dir;
+    };
+
     switch (choice) {
       case 1:
         s.print_evolution();
         break;
-      case 2:
+      case 2: {
+        std::string dir = make_dir();
         s.save_evolution(dir + "/evolution.txt");
         std::cout << "Saved to: " << dir << "/evolution.txt\n";
         break;
+      }
       case 3:
         s.print_statistics();
         break;
-      case 4:
+      case 4: {
+        std::string dir = make_dir();
         s.save_statistics(dir + "/statistics.txt");
         std::cout << "Saved to: " << dir << "/statistics.txt\n";
         break;
-      case 5:
+      }
+      case 5: {
+        std::string dir = make_dir();
         s.plot_evolution(dir + "/plot_evolution.png");
         std::cout << "Plot saved to: " << dir << "/plot_evolution.png\n";
         break;
-      case 6:
+      }
+      case 6: {
+        std::string dir = make_dir();
         s.plot_phase_space(dir + "/plot_phase_space.png");
         std::cout << "Phase space plot saved to: " << dir << "/plot_phase_space.png\n";
         break;
-      case 7:
+      }
+      case 7: {
+        std::string dir = make_dir();
         s.print_evolution();
         s.save_evolution(dir + "/evolution.txt");
         s.print_statistics();
@@ -67,6 +78,7 @@ int main() {
         s.plot_phase_space(dir + "/plot_phase_space.png");
         std::cout << "All files saved in: " << dir << "/\n";
         break;
+      }
       default:
         std::cerr << "Invalid choice\n";
         return EXIT_FAILURE;

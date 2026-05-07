@@ -27,10 +27,10 @@ struct StateRel {
 };
 
 struct Statistics {
-  double mean;
-  double sigma;
-  double maximum;
-  double minimum;
+  double mean{0.};
+  double sigma{0.};
+  double maximum{0.};
+  double minimum{0.};
 };
 
 class Simulation {
@@ -40,8 +40,9 @@ class Simulation {
   std::size_t const iterations_;
   StateRel state_;
   std::vector<State> evolution_;
-  Statistics sheep_stats_;
-  Statistics wolf_stats_;
+  Statistics sheep_stats_{};
+  Statistics wolf_stats_{};
+  bool stats_computed_{false};
 
   // validation
   static Parameters const& is_valid(Parameters const& p);

@@ -163,6 +163,17 @@ TEST_CASE("Testing getters") {
     CHECK(s.sheep_stats().sigma >= 0.);
     CHECK(s.wolf_stats().sigma >= 0.);
   }
+
+  SUBCASE("calling statistics() twice gives same result") {
+    s.compute();
+    s.statistics();
+    double mean_sheep_first = s.sheep_stats().mean;
+    double mean_wolf_first = s.wolf_stats().mean;
+
+    s.statistics();  // seconda chiamata
+    CHECK(s.sheep_stats().mean == mean_sheep_first);
+    CHECK(s.wolf_stats().mean == mean_wolf_first);
+  }
 }
 
 TEST_CASE("Testing operator==") {

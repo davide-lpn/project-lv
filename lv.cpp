@@ -54,7 +54,7 @@ Parameters Simulation::read_parameters() {
 
 double Simulation::read_population(std::string const& prompt) { return read_double(prompt); }
 
-double Simulation::read_dt() { return read_double("Enter time step (dt, recommended <= 0.001): )"); }
+double Simulation::read_dt() { return read_double("Enter time step (dt, recommended <= 0.001): "); }
 
 double Simulation::read_duration() { return read_double("Enter simulation duration: "); }
 
@@ -115,6 +115,10 @@ double Simulation::delta_H() const {
 }
 
 void Simulation::statistics() {
+  if (stats_computed_ == true) {
+    return;
+  }
+
   auto const n = static_cast<double>(evolution_.size());
 
   double sheep_sum = std::accumulate(evolution_.begin(), evolution_.end(), 0.,
@@ -158,6 +162,8 @@ void Simulation::statistics() {
 
   wolf_stats_.maximum = wolf_max->wolf;
   wolf_stats_.minimum = wolf_min->wolf;
+
+  stats_computed_ = true;
 }
 
 void Simulation::print_evolution() const {
@@ -226,7 +232,7 @@ void Simulation::save_statistics(std::string const& filename) {
 
   file << "Sheep statistics:\n"
        << " mean: " << sheep_stats_.mean << '\n'
-       << "sigma: " << sheep_stats_.sigma << '\n'
+       << " sigma: " << sheep_stats_.sigma << '\n'
        << "  maximum: " << sheep_stats_.maximum << '\n'
        << "  minimum: " << sheep_stats_.minimum << '\n';
 
